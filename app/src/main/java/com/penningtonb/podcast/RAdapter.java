@@ -7,9 +7,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 import java.util.ArrayList;
 
+/**
+ * Adapter for the RecyclerView, which is used to display a list.
+ */
 public class RAdapter extends RecyclerView.Adapter<RAdapter.ViewHolder> {
 
     class ViewHolder extends RecyclerView.ViewHolder{

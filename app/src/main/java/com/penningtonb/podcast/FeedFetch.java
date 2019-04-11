@@ -20,18 +20,29 @@ public class FeedFetch implements Runnable {
     private IProcess mProcess;
     private Activity activity;
 
-    FeedFetch(IProcess process, Activity activity, String feedUrl) {
-        this.mProcess = process;
+    /**
+     * FeedFetch constructor which provides the rss feed URL.
+     * @param activity MainActivity, which is also cast to the callback interface.
+     * @param feedUrl URL of the rss feed.
+     */
+    FeedFetch(Activity activity, String feedUrl) {
+        this.mProcess = (IProcess)activity;
         this.activity = activity;
         this.feedUrl = feedUrl;
         Log.i(TAG, "Initialized Feed Fetcher");
     }
 
+    /**
+     * A thread which makes a network call to a website based on the url given in the MainActivity.
+     * Using the EARL library, a list of episode titles is obtained, as well as a feed title. Finally,
+     * the updateAdapter() method from the MainActivity is called, which updates the RecyclerView.
+     */
     @Override
     public void run() {
         Log.i(TAG, "Starting thread...");
 
-        //String link = "https://nodumbqs.libsyn.com/rss";
+        // A valid rss feed url is given from the MainActivity. Then a connection is opened to the
+        // url.
         String link = feedUrl;
         InputStream inputStream = null;
         try {
@@ -39,6 +50,8 @@ public class FeedFetch implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        // The EARL library is used to parse the information from the website.
         Feed feed = null;
         try {
             assert inputStream != null;
@@ -50,12 +63,14 @@ public class FeedFetch implements Runnable {
         } catch (DataFormatException e) {
             e.printStackTrace();
         }
+
+        // The title and a list of episodes are added to a list, which will be passed to MainActivity.
         assert feed != null;
+
         Log.i(TAG, "Processing feed: " + feed.getTitle());
         feedTitle = feed.getTitle();
 
         feedList.clear();
-
         for (Item item : feed.getItems()) {
             String title = item.getTitle();
             feedList.add(title);

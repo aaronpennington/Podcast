@@ -37,21 +37,39 @@ public class MainActivity extends AppCompatActivity implements IProcess{
 
     }
 
+    /**
+     * Creates a FeedFetch thread, which makes a network call in a background thread to the given
+     * URL. Upon completion, the updateAdapter() method is called, which updates the RecyclerView.
+     * @param v The "Fetch Feed" button.
+     */
     public void updateFeed(View v) {
-        fetcher = new FeedFetch(this, this, feedUrl.getText().toString());
+        fetcher = new FeedFetch( this, feedUrl.getText().toString());
         Thread t = new Thread(fetcher);
         t.start();
     }
 
+    /**
+     * Takes a list of episode titles and a feed title from the FeedFetch thread. Adds the episode
+     * titles to a list, and updates the RecyclerView list to reflect that change.
+     * @param result A list of episode titles.
+     * @param feedTitle The title of the RSS feed.
+     */
     @Override
     public void updateAdapter(ArrayList<String> result, String feedTitle) {
         Log.i(TAG, "Updated feed list");
+
+        // Clear any existing episodes, then add the list from the FeedFetch thread.
         feedList.clear();
         feedList.addAll(result);
+
+        // Loop through all episode titles. For debugging purposes only.
         for (String item : feedList) {
             Log.i("Episode title: ", item);
         }
+
         this.feedTitle.setText(feedTitle);
+
+        // Let the recycler view adapter know that the feedList has been updated.
         rAdapter.notifyDataSetChanged();
     }
 }
