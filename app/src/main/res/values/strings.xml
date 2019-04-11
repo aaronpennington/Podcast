@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Podcast</string>
+    <string name="titleTextView">Title</string>
+    <string name="fetchFeed">Fetch Feed</string>
+</resources>
