@@ -43,7 +43,7 @@ public class FeedFetch implements Runnable {
 
         // A valid rss feed url is given from the MainActivity. Then a connection is opened to the
         // url.
-        String link = feedUrl;
+        String link = sterilizeUrl(feedUrl);
         InputStream inputStream = null;
         try {
             inputStream = new URL(link).openConnection().getInputStream();
@@ -82,5 +82,21 @@ public class FeedFetch implements Runnable {
                 mProcess.updateAdapter(feedList, feedTitle);
             }
         });
+    }
+
+    private String sterilizeUrl(String feedUrl) {
+        String newUrl = "";
+
+        // Check if the provided url beings with http://
+        // if so, change to https://
+        if (feedUrl.substring(0, 6).equals("http://")) {
+            newUrl = "https://" + feedUrl.substring(7);
+        }
+        else if (!feedUrl.substring(0, 7).equals("https://")) {
+            newUrl = "https://" + feedUrl;
+        }
+
+        Log.i(TAG, "New url = " + newUrl);
+        return newUrl;
     }
 }
