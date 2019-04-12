@@ -1,5 +1,6 @@
 package com.penningtonb.podcast;
 
+import android.graphics.drawable.Drawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -7,7 +8,12 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.einmalfel.earl.Feed;
+import com.einmalfel.earl.Item;
+
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements IProcess{
@@ -19,6 +25,8 @@ public class MainActivity extends AppCompatActivity implements IProcess{
     ArrayList<String> feedList;
     EditText feedUrl;
     TextView feedTitle;
+    TextView feedDescription;
+    ImageView feedImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +37,8 @@ public class MainActivity extends AppCompatActivity implements IProcess{
         findViewById(R.id.getFeedButton);
         feedUrl = findViewById(R.id.feedUrlText);
         feedTitle = findViewById(R.id.feedTitleText);
+        feedDescription = findViewById(R.id.feedDescriptionText);
+        feedImage = findViewById(R.id.feedImage);
 
         rAdapter = new RAdapter(feedList);
         RecyclerView recyclerView = findViewById(R.id.RView);
@@ -51,23 +61,28 @@ public class MainActivity extends AppCompatActivity implements IProcess{
     /**
      * Takes a list of episode titles and a feed title from the FeedFetch thread. Adds the episode
      * titles to a list, and updates the RecyclerView list to reflect that change.
-     * @param result A list of episode titles.
-     * @param feedTitle The title of the RSS feed.
+     * @param feed Feed object given by the EARL library after parsing the provided URL.
+     * @param feedImage Drawable object made in FeedFetch thread, which is set to the podcast artwork.
      */
     @Override
-    public void updateAdapter(ArrayList<String> result, String feedTitle) {
+    public void updateAdapter(Feed feed, Drawable feedImage) {
         Log.i(TAG, "Updated feed list");
 
         // Clear any existing episodes, then add the list from the FeedFetch thread.
         feedList.clear();
-        feedList.addAll(result);
-
-        // Loop through all episode titles. For debugging purposes only.
-        for (String item : feedList) {
-            Log.i("Episode title: ", item);
+        for (Item item : feed.getItems()) {
+            String title = item.getTitle();
+            feedList.add(title);
+            Log.i(TAG, "Episode title: " + item.getTitle());
         }
 
-        this.feedTitle.setText(feedTitle);
+        Log.i(TAG, "Image URL: " + feed.getImageLink());
+
+        this.feedTitle.setText(feed.getTitle());
+        this.feedDescription.setText(feed.getDescription());
+
+        // Create the podcast image
+        this.feedImage.setImageDrawable(feedImage);
 
         // Let the recycler view adapter know that the feedList has been updated.
         rAdapter.notifyDataSetChanged();

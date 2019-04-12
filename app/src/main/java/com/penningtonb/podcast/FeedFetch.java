@@ -1,6 +1,7 @@
 package com.penningtonb.podcast;
 
 import android.app.Activity;
+import android.graphics.drawable.Drawable;
 import android.util.Log;
 import com.einmalfel.earl.EarlParser;
 import com.einmalfel.earl.Feed;
@@ -44,6 +45,10 @@ public class FeedFetch implements Runnable {
         // A valid rss feed url is given from the MainActivity. Then a connection is opened to the
         // url.
         String link = sterilizeUrl(feedUrl);
+
+        // A sample url for debugging.
+        //String link = "https://nodumbqs.libsyn.com/rss";
+
         InputStream inputStream = null;
         try {
             inputStream = new URL(link).openConnection().getInputStream();
@@ -53,9 +58,11 @@ public class FeedFetch implements Runnable {
 
         // The EARL library is used to parse the information from the website.
         Feed feed = null;
+        Drawable d = null;
         try {
             assert inputStream != null;
             feed = EarlParser.parseOrThrow(inputStream, 0);
+
         } catch (XmlPullParserException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -64,22 +71,28 @@ public class FeedFetch implements Runnable {
             e.printStackTrace();
         }
 
-        // The title and a list of episodes are added to a list, which will be passed to MainActivity.
-        assert feed != null;
-
-        Log.i(TAG, "Processing feed: " + feed.getTitle());
-        feedTitle = feed.getTitle();
-
-        feedList.clear();
-        for (Item item : feed.getItems()) {
-            String title = item.getTitle();
-            feedList.add(title);
+        InputStream is = null;
+        try {
+            is = new URL(feed.getImageLink()).openConnection().getInputStream();
+            d = Drawable.createFromStream(is, feed.getImageLink());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
+
+
+        // The title and a list of episodes are added to a list, which will be passed to MainActivity.
+        assert feed != null;
+        assert d != null;
+
+        Log.i(TAG, "Processing feed: " + feed.getTitle());
+
+        final Feed finalFeed = feed;
+        final Drawable finalD = d;
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mProcess.updateAdapter(feedList, feedTitle);
+                mProcess.updateAdapter(finalFeed, finalD);
             }
         });
     }
