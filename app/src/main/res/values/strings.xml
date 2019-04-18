@@ -5,4 +5,6 @@
     <string name="feed_description">Description</string>
     <string name="feed_title">Feed Title</string>
     <string name="feed_image">Feed Image</string>
+    <string name="feed_url_hint">Enter Podcast Feed URL</string>
+    <string name="subscribe">Subscribe</string>
 </resources>

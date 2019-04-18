@@ -5,12 +5,10 @@ import android.graphics.drawable.Drawable;
 import android.util.Log;
 import com.einmalfel.earl.EarlParser;
 import com.einmalfel.earl.Feed;
-import com.einmalfel.earl.Item;
 import org.xmlpull.v1.XmlPullParserException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.zip.DataFormatException;
 
 public class FeedFetch implements Runnable {
@@ -69,7 +67,7 @@ public class FeedFetch implements Runnable {
             e.printStackTrace();
         }
 
-        InputStream is = null;
+        InputStream is;
         try {
             assert feed != null;
             is = new URL(feed.getImageLink()).openConnection().getInputStream();

@@ -3,7 +3,6 @@ package com.penningtonb.podcast;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.drawable.Drawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -12,18 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
-
-import com.einmalfel.earl.EarlParser;
-import com.einmalfel.earl.Feed;
-import com.einmalfel.earl.Item;
-
-import org.xmlpull.v1.XmlPullParserException;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.zip.DataFormatException;
 
 public class MainActivity extends AppCompatActivity{
 
@@ -39,10 +27,10 @@ public class MainActivity extends AppCompatActivity{
         setContentView(R.layout.activity_main);
 
         findViewById(R.id.getFeedButton);
-        feedUrl = findViewById(R.id.feedUrlText);
+        feedUrl = findViewById(R.id.feedLinkText);
         subscriptions = new ArrayList<>();
 
-        //sharedPrefs = this.getPreferences(Context.MODE_PRIVATE);
+        sharedPrefs = this.getPreferences(Context.MODE_PRIVATE);
 
         rAdapter = new RAdapter(subscriptions);
         RecyclerView recyclerView = findViewById(R.id.subscriptionsRecyclerView);
@@ -55,14 +43,32 @@ public class MainActivity extends AppCompatActivity{
      * @param view Fetch Feed button
      */
     public void displayFeed(View view) {
-        Intent displayFeedIntent = new Intent(MainActivity.this, DisplayFeedActivity.class);
-        displayFeedIntent.putExtra("Feed URL", this.feedUrl.getText().toString());
-        startActivity(displayFeedIntent);
-        Log.i(TAG, "Display Feed Activity started.");
+        //TODO: Add error handling here.
+        // For example, if url is null, display activity should not launch.
+
+        if (feedUrl.getText().toString().equals("")) {
+            Toast.makeText(this, "Please enter a URL", Toast.LENGTH_SHORT).show();
+        }
+        else {
+            Intent displayFeedIntent = new Intent(MainActivity.this, DisplayFeedActivity.class);
+            displayFeedIntent.putExtra("Feed URL", this.feedUrl.getText().toString());
+            startActivity(displayFeedIntent);
+            Log.i(TAG, "Display Feed Activity started.");
+        }
     }
 
     public void subscribeToFeed(View view) {
-        // Save rss feed title to subscriptions, and save subscriptions to sharedPrefs.
         Toast.makeText(this, "Oops, this doesn't work yet!", Toast.LENGTH_SHORT).show();
+
+        // Save rss feed title to subscriptions, and save subscriptions to sharedPrefs.
+        //TODO: Call a thread to get the title of the RSS feed from the given URL.
+        String val = "No Dumb Questions";
+
+        SharedPreferences.Editor editor = sharedPrefs.edit();
+        editor.putString("NDQ", val);
+        editor.apply();
+
+        subscriptions.add(sharedPrefs.getString("NDQ", null));
+        rAdapter.notifyDataSetChanged();
     }
 }

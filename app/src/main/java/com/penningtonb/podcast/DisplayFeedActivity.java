@@ -1,6 +1,5 @@
 package com.penningtonb.podcast;
 
-import android.app.ActionBar;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.support.v7.app.AppCompatActivity;
@@ -9,17 +8,11 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import com.einmalfel.earl.Feed;
 import com.einmalfel.earl.Item;
-
 import java.util.ArrayList;
-import java.util.Objects;
 
 public class DisplayFeedActivity extends AppCompatActivity implements IProcess {
 
