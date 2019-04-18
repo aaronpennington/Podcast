@@ -2,4 +2,7 @@
     <string name="app_name">Podcast</string>
     <string name="titleTextView">Title</string>
     <string name="fetchFeed">Fetch Feed</string>
+    <string name="feed_description">Description</string>
+    <string name="feed_title">Feed Title</string>
+    <string name="feed_image">Feed Image</string>
 </resources>
