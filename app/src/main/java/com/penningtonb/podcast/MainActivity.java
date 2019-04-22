@@ -3,6 +3,7 @@ package com.penningtonb.podcast;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -11,9 +12,17 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
+import com.einmalfel.earl.EarlParser;
+import com.einmalfel.earl.Feed;
+import org.xmlpull.v1.XmlPullParserException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.zip.DataFormatException;
 
-public class MainActivity extends AppCompatActivity{
+public class MainActivity extends AppCompatActivity implements IProcess{
 
     private static final String TAG = "MainActivity";
     EditText feedUrl;
@@ -29,8 +38,17 @@ public class MainActivity extends AppCompatActivity{
         findViewById(R.id.getFeedButton);
         feedUrl = findViewById(R.id.feedLinkText);
         subscriptions = new ArrayList<>();
-
         sharedPrefs = this.getPreferences(Context.MODE_PRIVATE);
+
+        SharedPreferences.Editor editor = sharedPrefs.edit();
+        editor.remove("NDQ");
+        editor.apply();
+
+        Map<String, ?> prefs = sharedPrefs.getAll();
+        for(Map.Entry<String, ?> entry : prefs.entrySet()) {
+            subscriptions.add(entry.getValue().toString());
+            Log.d(TAG, "Added " + entry.getValue().toString() + "to subscriptions");
+        }
 
         rAdapter = new RAdapter(subscriptions);
         RecyclerView recyclerView = findViewById(R.id.subscriptionsRecyclerView);
@@ -61,14 +79,90 @@ public class MainActivity extends AppCompatActivity{
         Toast.makeText(this, "Oops, this doesn't work yet!", Toast.LENGTH_SHORT).show();
 
         // Save rss feed title to subscriptions, and save subscriptions to sharedPrefs.
-        //TODO: Call a thread to get the title of the RSS feed from the given URL.
-        String val = "No Dumb Questions";
+
+        final String link = serializeLink(feedUrl.getText().toString());
+
+        if (link.equals("")) {
+            Toast.makeText(this, "Please enter a URL", Toast.LENGTH_SHORT).show();
+        }
+        else {
+            Thread t = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    InputStream inputStream = null;
+                    try {
+                        inputStream = new URL(link).openConnection().getInputStream();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    // The EARL library is used to parse the information from the website.
+                    Feed feed = null;
+                    final Drawable d = null;
+                    try {
+                        assert inputStream != null;
+                        feed = EarlParser.parseOrThrow(inputStream, 0);
+
+                    } catch (XmlPullParserException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (DataFormatException e) {
+                        e.printStackTrace();
+                    }
+
+                    final Feed finalFeed = feed;
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            updateAdapter(finalFeed, d);
+                        }
+                    });
+                }
+            });
+            t.start();
+        }
+    }
+
+    @Override
+    public void updateAdapter(Feed feed, Drawable feedImage) {
+        String feedTitle = feed.getTitle();
 
         SharedPreferences.Editor editor = sharedPrefs.edit();
-        editor.putString("NDQ", val);
+        editor.putString(feedTitle, feedTitle);
         editor.apply();
 
-        subscriptions.add(sharedPrefs.getString("NDQ", null));
+        subscriptions.add(sharedPrefs.getString(feedTitle, feedTitle));
         rAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public String serializeLink(String link) {
+        String newUrl = "";
+
+        int dots = 0;
+        // Check whether the url needs 'www.' appended
+        for (int i = 0; i < link.length(); i++) {
+            if (link.charAt(i) == '.'){
+                dots++;
+            }
+        }
+
+        if (dots < 2){
+            link = "www." + link;
+            Log.d(TAG, "URL = " + link);
+        }
+
+        // Check if the provided url beings with http://
+        // if so, change to https://
+        if (link.substring(0, 7).equals("http://")) {
+            newUrl = "https://" + link.substring(7);
+        }
+        else if (!link.substring(0, 8).equals("https://")) {
+            newUrl = "https://" + link;
+        }
+
+        Log.i(TAG, "New url = " + newUrl);
+        return newUrl;
     }
 }

@@ -40,7 +40,7 @@ public class FeedFetch implements Runnable {
 
         // A valid rss feed url is given from the MainActivity. Then a connection is opened to the
         // url.
-        String link = sterilizeUrl(feedUrl);
+        String link = feedUrl;
 
         // A sample url for debugging.
         //String link = "https://nodumbqs.libsyn.com/rss";
@@ -91,34 +91,6 @@ public class FeedFetch implements Runnable {
                 mProcess.updateAdapter(finalFeed, finalD);
             }
         });
-    }
-
-    private String sterilizeUrl(String feedUrl) {
-        String newUrl = "";
-
-        int dots = 0;
-        // Check whether the url needs 'www.' appended
-        for (int i = 0; i < feedUrl.length(); i++) {
-            if (feedUrl.charAt(i) == '.'){
-                dots++;
-            }
-        }
-
-        if (dots < 2){
-            feedUrl = "www." + feedUrl;
-        }
-
-        // Check if the provided url beings with http://
-        // if so, change to https://
-        if (feedUrl.substring(0, 6).equals("http://")) {
-            newUrl = "https://" + feedUrl.substring(7);
-        }
-        else if (!feedUrl.substring(0, 7).equals("https://")) {
-            newUrl = "https://" + feedUrl;
-        }
-
-        Log.i(TAG, "New url = " + newUrl);
-        return newUrl;
     }
 
 }

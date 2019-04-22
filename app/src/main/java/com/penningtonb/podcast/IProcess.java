@@ -10,4 +10,5 @@ import com.einmalfel.earl.Feed;
  */
 public interface IProcess {
     void updateAdapter(Feed feed, Drawable feedImage);
+    String serializeLink(String link);
 }

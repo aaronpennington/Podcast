@@ -53,7 +53,7 @@ public class DisplayFeedActivity extends AppCompatActivity implements IProcess {
      * URL. Upon completion, the updateAdapter() method is called, which updates the RecyclerView.
      */
     public void updateFeed() {
-        fetcher = new FeedFetch( this, feedUrl);
+        fetcher = new FeedFetch( this, serializeLink(feedUrl));
         Thread t = new Thread(fetcher);
         t.start();
     }
@@ -86,5 +86,35 @@ public class DisplayFeedActivity extends AppCompatActivity implements IProcess {
 
         // Let the recycler view adapter know that the feedList has been updated.
         rAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public String serializeLink(String link) {
+        String newUrl = "";
+
+        int dots = 0;
+        // Check whether the url needs 'www.' appended
+        for (int i = 0; i < link.length(); i++) {
+            if (link.charAt(i) == '.'){
+                dots++;
+            }
+        }
+
+        if (dots < 2){
+            link = "www." + link;
+            Log.d(TAG, "URL = " + link);
+        }
+
+        // Check if the provided url beings with http://
+        // if so, change to https://
+        if (link.substring(0, 7).equals("http://")) {
+            newUrl = "https://" + link.substring(7);
+        }
+        else if (!link.substring(0, 8).equals("https://")) {
+            newUrl = "https://" + link;
+        }
+
+        Log.i(TAG, "New url = " + newUrl);
+        return newUrl;
     }
 }
