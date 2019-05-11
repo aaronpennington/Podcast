@@ -24,6 +24,11 @@ import java.util.zip.DataFormatException;
 
 public class MainActivity extends AppCompatActivity implements IProcess{
 
+    // TODO:
+    //  Media Player
+    //  Podcast Search/Discovery API
+    //  Make subscriptions list clickable
+
     private static final String TAG = "MainActivity";
     EditText feedUrl;
     ArrayList<String> subscriptions;
@@ -75,6 +80,10 @@ public class MainActivity extends AppCompatActivity implements IProcess{
         }
     }
 
+    /**
+     * Adds a rss feed title to a list which is automatically displayed when the app starts.
+     * @param view The url of the feed which is being subscribed to.
+     */
     public void subscribeToFeed(View view) {
         Toast.makeText(this, "Oops, this doesn't work yet!", Toast.LENGTH_SHORT).show();
 
@@ -124,6 +133,11 @@ public class MainActivity extends AppCompatActivity implements IProcess{
         }
     }
 
+    /**
+     * Updates the recycler view with the new list of subscriptions.
+     * @param feed The list of feeds subscribed to.
+     * @param feedImage RSS feed artwork as a drawable image
+     */
     @Override
     public void updateAdapter(Feed feed, Drawable feedImage) {
         String feedTitle = feed.getTitle();
@@ -136,6 +150,11 @@ public class MainActivity extends AppCompatActivity implements IProcess{
         rAdapter.notifyDataSetChanged();
     }
 
+    /**
+     * Standardizes the urls that are entered by the user.
+     * @param link The url entered by the user
+     * @return The updated url. 
+     */
     @Override
     public String serializeLink(String link) {
         String newUrl = "";
